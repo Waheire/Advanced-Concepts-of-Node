@@ -1,26 +1,17 @@
-const cluster = require("cluster");
-console.log(cluster.isMaster, `Master ${process.pid} is running`);
+const crypto = require("crypto");
 
-if (cluster.isMaster) {
-  // Fork workers.
-  for (let i = 0; i < 2; i++) {
-    cluster.fork();
-  }
-} else {
+const express = require("express");
+const app = express();
 
-  const express = require("express");
-  const app = express();
-  
-  function doWork(duration) {
-    const start = Date.now();
-    while (Date.now() - start < duration) {}
-  }
-  
-  // Request handler
-  app.get("/", (req, res) => {
-    doWork(5000);
+// Request handler
+app.get("/", (req, res) => {
+  crypto.pbkdf2("a", "b", 100000, 512, "sha512", () => {
     res.send("Hello World");
   });
-  
-  app.listen(3000);
-}
+});
+
+app.get("/fast", (req, res) => {
+  res.send("This was fast!");
+});
+
+app.listen(3000);
